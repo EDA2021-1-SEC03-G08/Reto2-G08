@@ -37,22 +37,70 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("2- Top videos por categoria en un pais")
+    print("3- Videos con mas likes")
+    print("4- Videos con mas likes por pais")
 
-catalog = None
-
+    
 """
 Menu principal
 """
+
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
+        print("Inicializando Catálogo ...")
+        catalog = controller.newCatalog()
+        controller.loadData(catalog)
+        print("Videos cargados " + str(lt.size(catalog["videos"])) + " videos")
+        firstElement = controller.getFirstVideo(catalog)
+        print("Info primer video")
+        print("title: " + firstElement["title"])
+        print("channel_title: " + firstElement["channel_title"])
+        print("country: " + firstElement["country"])
+        print("views: " + firstElement["views"])
+        print("likes: " + firstElement["likes"])
+        print("Categories")
 
+        for category in lt.iterator(catalog["categories"]):
+            print(category['name'] + ": " + category['id'])
     elif int(inputs[0]) == 2:
-        pass
+        category = input('Ingrese la categoria (category_id):\n')
+        country = input('Ingrese el pais :\n')
+        top = input('Numeros de videos a colocar:\n')
+        videosByCountry = controller.getMostViewedVideos(catalog, country, category, top)
+        for video in lt.iterator(videosByCountry):
+            print('trending_date: ' + video['trending_date'])
+            print('title: ' + video['title'])
+            print('publish_time: ' + video['publish_time'])
+            print('views: ' + video['views'])
+            print('likes: ' + video['likes'])
+      elif int(inputs[0]) == 3:
+        top = input('Cantidad de videos a colocar:\n')
+        videos = controller.getMostLikedVideos(catalog, top)
+        for video in lt.iterator(videos):
+            print("Title: " + video['title'])
+            print("channel_title: " + video['channel_title'])
+            print("views: " + video['views'])
+            print("likes: " + video['likes'])
+            print("tags: " + video['tags'])
+            print("publish_time: " + video['publish_time'])
 
+    elif int(inputs[0]) == 4:
+        country = input('Ingrese el pais (country):\n')
+        tag = input('Ingrese el tag:\n')
+        top = input('Numeros de videos a listar:\n')
+        videosTag = controller.getMostLikedVideosByCountryAndTag(
+            catalog, country, tag, top)
+        for video in lt.iterator(videosTag):
+            print("Title: " + video['title'])
+            print("channel_title: " + video['channel_title'])
+            print("views: " + video['views'])
+            print("likes: " + video['likes'])
+            print("dislikes: " + video['dislikes'])
+            print("publish_time: " + video['publish_time'])
+            print("tags: " + video['tags'])
     else:
         sys.exit(0)
 sys.exit(0)

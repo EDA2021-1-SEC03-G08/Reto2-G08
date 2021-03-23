@@ -24,15 +24,67 @@ import config as cf
 import model
 import csv
 
+# Inicialización del Catálogo 
+def initCatalog():
 
-"""
-El controlador se encarga de mediar entre la vista y el modelo.
-"""
+    """
+    Llama la funcion de inicializacion del catalogo del modelo.
+    """
+    catalog = model.newCatalog()
+    return catalog
 
-# Inicialización del Catálogo de libros
+def newCatalog():
+    catalog = model.newCatalog()
+    return catalog
 
 # Funciones para la carga de datos
+def loadData(catalog):
+    loadVideos(catalog)
+    loadCategories(catalog)
 
-# Funciones de ordenamiento
+def loadVideos(catalog):
+    videoFile = cf.data_dir+'videos-small.csv'
+    inputFile = csv.DictReader(open(videoFile, encoding="utf-8"))
+    for video in inputFile:
+        model.addVideo(catalog, video)
+
+def loadCategories(catalog):
+    categoryFile = cf.data_dir+'category-id.csv'
+    inputFile = csv.DictReader(open(categoryFile, encoding="utf-8"))
+    for category in inputFile:
+        model.addCategory(catalog, category)
 
 # Funciones de consulta sobre el catálogo
+
+def getFirstVideo(catalog):
+    return model.getFirstVideo(catalog)
+
+def getMostLikedVideos(catalog, country, tag, top):
+    counter = 0
+    lst = model.sortVideosByLikes(catalog)
+    emptyLst = model.emptyList()
+    for video in lt.iterator(lst):
+        if(counter <= int(top)):
+            if(video['country'] == country):
+                hasTag = False
+                for tagItem in video['tags'].split('|'):
+                    finalTag = tagItem.replace('"', "")
+                    if(finalTag == tag):
+                        hasTag = True
+                if(hasTag):
+                    lt.addLast(emptyLst, video)
+                    counter = 1+counter
+    return emptyLst
+
+# Por categoria y pais
+def getMostViewedVideos(catalog, country, categoryId, top):
+    counter = 0
+    lst = model.sortVideosByViews(catalog)
+    emptyLst = model.emptyList()
+    for video in lt.iterator(lst):
+        if(counter < int(top)):
+            if(video['country'] == country and video['category_id'] == categoryId):
+                lt.addLast(emptyLst, video)
+                counter = 1 + counter
+    return emptyLst
+
