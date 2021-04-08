@@ -69,14 +69,15 @@ while True:
         category = input('Ingrese la categoria (category_id):\n')
         country = input('Ingrese el pais :\n')
         top = input('Numeros de videos a colocar:\n')
-        videosByCountry = controller.getMostViewedVideos(catalog, country, category, top)
+        videosByCountry = controller.getMostViewedVideos (catalog, country, category, top)
         for video in lt.iterator(videosByCountry):
             print('trending_date: ' + video['trending_date'])
             print('title: ' + video['title'])
             print('publish_time: ' + video['publish_time'])
             print('views: ' + video['views'])
             print('likes: ' + video['likes'])
-      elif int(inputs[0]) == 3:
+
+    elif int(inputs[0]) == 3:
         top = input('Cantidad de videos a colocar:\n')
         videos = controller.getMostLikedVideos(catalog, top)
         for video in lt.iterator(videos):

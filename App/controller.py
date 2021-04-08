@@ -19,7 +19,8 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
-
+import time
+import tracemalloc
 import config as cf
 import model
 import csv
@@ -39,8 +40,23 @@ def newCatalog():
 
 # Funciones para la carga de datos
 def loadData(catalog):
+    delta_time = -1.0
+    delta_memory = -1.0
+
+    tracemalloc.start()
+    start_time = getTime()
+    start_memory = getMemory()
+
     loadVideos(catalog)
     loadCategories(catalog)
+
+    stop_memory = getMemory()
+    stop_time = getTime()
+    tracemalloc.stop()
+
+    delta_time = stop_time - start_time
+    delta_memory = deltaMemory(start_memory, stop_memory)
+    return delta_time, delta_memory
 
 def loadVideos(catalog):
     videoFile = cf.data_dir+'videos-small.csv'
@@ -88,3 +104,23 @@ def getMostViewedVideos(catalog, country, categoryId, top):
                 counter = 1 + counter
     return emptyLst
 
+def getTime():
+    
+    return float(time.perf_counter()*1000)
+
+
+def getMemory():
+   
+    return tracemalloc.take_snapshot()
+
+
+def deltaMemory(start_memory, stop_memory):
+  
+    memory_diff = stop_memory.compare_to(start_memory, "filename")
+    delta_memory = 0.0
+
+    for stat in memory_diff:
+        delta_memory = delta_memory + stat.size_diff
+
+    delta_memory = delta_memory/1024.0
+    return delta_memory

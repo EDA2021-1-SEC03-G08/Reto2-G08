@@ -40,7 +40,7 @@ los mismos.
 # Construccion de modelos
 
 def newCatalog():
-     catalog = {'videos': None,
+    catalog = {'videos': None,
                'videosIds': None,
                'chennelTitle': None,
                'country': None,
