@@ -48,16 +48,17 @@ def newCatalog():
                'likes': None,
                'dislikes': None,
                'publishTime': None,
-               'categories': None}
+               'categories': None,
+               'categoryIds':None}
 
 # Falta completar que tipo de estrutctura elegir
     catalog['videos'] = lt.newList('SINGLE_LINKED')
 
     catalog['categories'] = lt.newList('SINGLE_LINKED')
 
-    catalog['videosIds'] = mp.newMap(376000, maptype='PROBING', loadfactor=4.0, comparefunction=compareMapVideoIds)
+    catalog['videosIds'] = mp.newMap(376000, maptype='PROBING', loadfactor=0.5, comparefunction=compareMapVideoIds)
 
-    catalog['categoryIds'] = mp.newMap(376000, maptype='CHAINING', loadfactor=4.0, comparefunction=compareMapCategoryIds)
+    catalog['categoryIds'] = mp.newMap(376000, maptype='CHAINING', loadfactor=0.5, comparefunction=compareMapCategoryIds)
 
     catalog['chennelTitle'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareChannelTitle)
 
@@ -72,7 +73,10 @@ def newCatalog():
     catalog['publish_time'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=comparePublishTime)       
 
     catalog['trending_date'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareTrendingDays)
+    
+    catalog['countries'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareCountry)
     return catalog
+
 
 # Funciones para agregar informacion al catalogo
 
@@ -165,7 +169,7 @@ def newCountry(countryName):
     country={'name':"", 
             "videos":None}
     country['name'] = countryName
-    country['videos'] = lt.newList('ARRAY_LIST', compareCountries)
+    country['videos'] = lt.newList('ARRAY_LIST', compareCountry)
     return country
 
 
