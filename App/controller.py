@@ -92,7 +92,6 @@ def getMostLikedVideos(catalog, country, tag, top):
                     counter = 1+counter
     return emptyLst
 
-# Por categoria y pais
 def getMostViewedVideos(catalog, country, categoryId, top):
     counter = 0
     lst = model.sortVideosByViews(catalog)
@@ -103,6 +102,22 @@ def getMostViewedVideos(catalog, country, categoryId, top):
                 lt.addLast(emptyLst, video)
                 counter = 1 + counter
     return emptyLst
+
+def getVideoWithMostTrendingDaysByCountry(catalog, country):
+    lst = model.sortVideosByTrendingDays(catalog)
+    for vid in lt.iterator(lst):
+        if(vid['country'] == country):
+            return vid
+
+def getVideoWithMostTrendingDaysByCategory(catalog, categoryId):
+    lst = model.sortVideosByTrendingDays(catalog)
+    for video in lt.iterator(lst):
+        if(video['category_id'] == categoryId):
+            return video
+
+
+def getTrendingDays(video):
+    return model.getTrendingDays(video)
 
 def getTime():
     

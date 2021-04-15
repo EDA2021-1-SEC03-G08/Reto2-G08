@@ -37,9 +37,11 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- Top videos por categoria en un pais")
-    print("3- Videos con mas likes")
-    print("4- Videos con mas likes por pais")
+    print("2- Top videos por categoria en un pais con respecto al numero de vistas")
+    print("3- Video trending por mas dias en un pais")
+    print("4- Video trending por mas dias por categoria")
+    print("5- Videos con mas likes por pais y por tag")
+    print("6- Videos con mas likes")
 
     
 """
@@ -73,22 +75,29 @@ while True:
         for video in lt.iterator(videosByCountry):
             print('trending_date: ' + video['trending_date'])
             print('title: ' + video['title'])
+            print('channel_title' + video)
             print('publish_time: ' + video['publish_time'])
             print('views: ' + video['views'])
             print('likes: ' + video['likes'])
 
     elif int(inputs[0]) == 3:
-        top = input('Cantidad de videos a colocar:\n')
-        videos = controller.getMostLikedVideos(catalog, top)
-        for video in lt.iterator(videos):
-            print("Title: " + video['title'])
-            print("channel_title: " + video['channel_title'])
-            print("views: " + video['views'])
-            print("likes: " + video['likes'])
-            print("tags: " + video['tags'])
-            print("publish_time: " + video['publish_time'])
+        country = input('Ingrese el pais (country):\n')
+        video = controller.getVideoWithMostTrendingDaysByCountry(
+            catalog, country)
+        print("title: "+video['title'])
+        print("channel_title: "+video['channel_title'])
+        print("country: "+video['country'])
+        print("La cantidad de dias que el video fue tendencia fueron: " + str(controller.getTrendingDays(video)))
 
     elif int(inputs[0]) == 4:
+        category = input('Ponga la categoria (category_id):\n')
+        video = controller.getVideoWithMostTrendingDaysByCategory(catalog,category)
+        print("title: "+video['title'])
+        print("channel_title: "+video['channel_title'])
+        print("category_id: "+video['category_id'])
+        print("Días: "+str(controller.getTrendingDays(video)))
+
+    elif int(inputs[0]) == 5:
         country = input('Ingrese el pais (country):\n')
         tag = input('Ingrese el tag:\n')
         top = input('Numeros de videos a listar:\n')
@@ -102,6 +111,17 @@ while True:
             print("dislikes: " + video['dislikes'])
             print("publish_time: " + video['publish_time'])
             print("tags: " + video['tags'])
+
+    elif int(inputs[0]) == 6:
+        top = input('Cantidad de videos a colocar:\n')
+        videos = controller.getMostLikedVideos(catalog, top)
+        for video in lt.iterator(videos):
+            print("Title: " + video['title'])
+            print("channel_title: " + video['channel_title'])
+            print("views: " + video['views'])
+            print("likes: " + video['likes'])
+            print("tags: " + video['tags'])
+            print("publish_time: " + video['publish_time'])
     else:
         sys.exit(0)
 sys.exit(0)
