@@ -37,10 +37,10 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- Top videos por categoria en un pais con respecto al numero de vistas")
-    print("3- Video trending por mas dias en un pais")
-    print("4- Video trending por mas dias por categoria")
-    print("5- Videos con mas likes por pais y por tag")
+    print("2- Top videos por categoria en un pais con respecto al numero de vistas") #REQ 1
+    print("3- Video trending por mas dias en un pais")#REQ2
+    print("4- Video trending por mas dias por categoria") #REQ3
+    print("5- Videos con mas likes por pais y por tag")#REQ4
     print("6- Videos con mas likes")
 
     
@@ -72,7 +72,7 @@ while True:
         country = input('Ingrese el pais :\n')
         top = input('Numeros de videos a colocar:\n')
         videosByCountry = controller.getMostViewedVideos (catalog, country, category, top)
-        for video in lt.iterator(videosByCountry):
+        for video in lt.iterator(videosByCountry):  
             print('trending_date: ' + video['trending_date'])
             print('title: ' + video['title'])
             print('channel_title' + video)

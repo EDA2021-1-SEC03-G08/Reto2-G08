@@ -29,13 +29,8 @@ import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
-from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import mergesort as sa
 assert cf
-
-"""
-Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
-los mismos.
-"""
 
 # Construccion de modelos
 
@@ -46,8 +41,6 @@ def newCatalog():
                'country': None,
                'views': None,
                'likes': None,
-               'dislikes': None,
-               'publishTime': None,
                'categories': None,
                'categoryIds':None}
 
@@ -56,35 +49,32 @@ def newCatalog():
 
     catalog['categories'] = lt.newList('SINGLE_LINKED')
 
-    catalog['videosIds'] = mp.newMap(376000, maptype='PROBING', loadfactor=0.5, comparefunction=compareMapVideoIds)
+    catalog['videosIds'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareMapVideoIds)
 
-    catalog['categoryIds'] = mp.newMap(376000, maptype='CHAINING', loadfactor=0.5, comparefunction=compareMapCategoryIds)
+    catalog['categoryIds'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareMapCategoryIds)
 
-    catalog['chennelTitle'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareChannelTitle)
+    catalog['chennelTitle'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareChannelTitle)
 
-    catalog['country'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareCountry)
+    catalog['country'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareCountry)
 
-    catalog['views'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareViews)
+    catalog['views'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareViews)
 
-    catalog['likes'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareLikes)
+    catalog['likes'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareLikes)
 
-    catalog['dislikes'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareDislikes)
-
-    catalog['publish_time'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=comparePublishTime)       
-
-    catalog['trending_date'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareTrendingDays)
+    catalog['trending_date'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareTrendingDays)
     
-    catalog['countries'] = mp.newMap(100000, maptype='PROBING', loadfactor=0.5, comparefunction=compareCountry)
+    catalog['countries'] = mp.newMap(999983, maptype='CHAINING', loadfactor=5, comparefunction=compareCountry)
     return catalog
 
 
-# Funciones para agregar informacion al catalogo
+
 
 def emptyList():
-    return lt.newList('ARRAY_LIST')
+    return lt.newList('SINGLE_LINKED')
 
 def addCategory(catalog, category):
     lt.addLast(catalog["categories"], category)
+
 
 def addCountryVideo(catalog, countryName, video):
     countries = catalog['countries']
@@ -96,34 +86,32 @@ def addCountryVideo(catalog, countryName, video):
         mp.put(countries, countryName, country)
     lt.addLast(country['videos'], video)
 
+
 def addCategoryIdVideo(catalog, categoryId, video):
-    categories = catalog['categoryIds']
-    if mp.contains(categories, categoryId):
-        g= mp.get(categories, categoryId)
+    catego = catalog['categoryIds']
+    if mp.contains(catego, categoryId):
+        g= mp.get(catego, categoryId)
         category = me.getValue(g) 
     else:
         category = newCategory(categoryId)
-        mp.put(categories, categoryId, category)
+        mp.put(catego, categoryId, category)
     lt.addLast(category['videos'],video)
+
 
 def addVideo(catalog, video):
     lt.addLast(catalog['videos'], video)
     mp.put(catalog['videosIds'], video['video_id'], video)
     channels = video['channel_title'].split(",")  
     country = video['country']
+    categoryId = video["category_id"]
     addCountryVideo(catalog, country, video)
     addCategoryIdVideo(catalog, categoryId, video)
     for channel in channels:
         addChannel(catalog, channel.strip(), video)
-    addPublishTime(catalog, video)
+    
 
 def addPublishTime(catalog, video):
-    """
-    Esta funcion adiciona un libro a la lista de libros que
-    fueron publicados en un año especifico.
-    Los años se guardan en un Map, donde la llave es el año
-    y el valor la lista de libros de ese año.
-    """
+
     try:
         pTime = catalog['publishTime']
         if (video['publish_time'] != ''):
@@ -155,7 +143,7 @@ def addChannel(catalog, channel, video):
         mp.put(channels, channel, author)
     lt.addLast(author['videos'], video)
 
-# Funciones para creacion de datos
+
 def newChannel(channelName):
     channel = {'name': "",
               "videos": None,
@@ -166,23 +154,29 @@ def newChannel(channelName):
 
 
 def newCountry(countryName):
-    country={'name':"", 
-            "videos":None}
-    country['name'] = countryName
+    country={'nameCo':"","videos":None}
+    country['nameCo'] = countryName
     country['videos'] = lt.newList('ARRAY_LIST', compareCountry)
     return country
 
 
-def newCategory(categoryId):
-    category = {'id':0,
-           "videos":None}
-    category['id'] = categoryId
+def newCategory(catId):
+    category = {'id':0, "videos":None}
+    category['id'] = catId
     category['videos'] = lt.newList('ARRAY_LIST', compareCountries)
     return category
 
-# Funciones de consulta
+
 def getFirstVideo(catalog):
     return lt.firstElement(catalog['videos'])
+
+
+def getCountry(catalog, countryName):
+    countryN = mo.get(catalog["countries"], countryName)
+    if countryN == countryName:
+        return me.getValue(countryN) 
+    return None
+
 
 def getCategory(catalog, categoryId):
     category = mp.get(catalog['categoryIds'], categoryId)
@@ -196,14 +190,15 @@ def getVideosByCountry(catalog, country):
         return me.getValue(countryList)
     return None
 
+###
 def getTrendingDays(video, catalog):
-    ls = emptyList()
+    lstt = emptyList()
     counter = 0
     for i in lt.iterator(catalog['videos']):
         if i['video_id']==video['video_id']:
             t = i['trending_date']
-            if t not in ls:
-                lt.addLast(ls, t)
+            if t not in lstt:
+                lt.addLast(lstt, t)
                 counter=+1
     return(counter)
 
@@ -215,21 +210,22 @@ def compareLikes(video1, video2):
 def compareViews(video1, video2):
     return (int(video1['views']) > int(video2['views']))
 
-def compareMapVideoIds(id, tag):
-    tagentry = me.getKey(tag)
-    if (int(id) == int(tagentry)):
+
+def compareMapVideoIds(key, param):
+    tagentry = me.getKey(param)
+    if (int(key) == int(tagentry)):
         return 0
-    elif (int(id) > int(tagentry)):
+    elif (int(key) > int(tagentry)):
         return 1
     else:
         return 0
 
-def compareMapCategoryIds():
 
-    tagentry = me.getKey(tag)
-    if (int(id) == int(tagentry)):
+def compareMapCategoryIds(cid,param):
+    tagentry = me.getKey(param)
+    if (int(cid) == int(tagentry)):
         return 0
-    elif (int(id) > int(tagentry)):
+    elif (int(cid) > int(tagentry)):
         return 1
     else:
         return 0
@@ -243,13 +239,14 @@ def compareChannelTitle(keyname, channelTitle):
     else:
         return -1
 
-def compareCountry(c1, c2):
-    if (int(c1) == int(c2)):
+def compareCountry(k1, c2):
+    country = me.getKey(c2)
+    if (int(k1) == int(country)):
         return 0
-    elif (int(c1) > int(c2)):
+    elif (int(k1) > int(country)):
         return 1
     else:
-        return 0
+        return -1
 
 def compareDislikes(l1,l2):
     if (int(l1) == int(l2)):
@@ -275,19 +272,19 @@ def compareTrendingDays(d1, d2):
         return 1
     else:
         return 0
-
+  
 def sortVideosByTrendingDays(catalog):
     lst = catalog['videos']
     sa.sort(lst, compareTrendingDays)
     return lst
 
 
-def sortVideosByLikes(catalog):
+def sortVideosByLikes(videos):
     lst = catalog['videos']
     sa.sort(lst, compareLikes)
     return lst
 
-def sortVideosByViews(catalog):
-    lst = catalog['videos']
+def sortVideosByViews(videos):
+    lst = videos['videos']
     sa.sort(lst, compareViews)
     return lst
